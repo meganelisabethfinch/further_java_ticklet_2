@@ -66,7 +66,7 @@ public class ChatClient {
             ObjectOutputStream oos = new ObjectOutputStream(os);
             while (true) {
                 byte[] input = r.readLine().getBytes();
-                String inputStr = Arrays.toString(input);
+                String inputStr = new String(input);
                 Message msg;
 
                 // Handle special commands
@@ -74,11 +74,11 @@ public class ChatClient {
                     msg = new ChangeNickMessage(inputStr.substring(6));
                     oos.writeObject(msg);
                 } else if (inputStr.equals("\\quit")) {
-                    System.out.println("quitting");
+                    System.out.format("%s [Client] Connection terminated.\n");
                     s.close();
                     return;
                 } else if (inputStr.startsWith("\\")) {
-                    System.out.format("%s [Server] Unknown command %s", dateFormatter.format(new Date()), inputStr);
+                    System.out.format("%s [Server] Unknown command \"%s\"\n", dateFormatter.format(new Date()), inputStr);
                 } else {
                     // Forward chat message to other clients via server
                     msg = new ChatMessage(inputStr);
