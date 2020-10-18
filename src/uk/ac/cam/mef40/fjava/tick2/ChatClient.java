@@ -1,13 +1,12 @@
 package uk.ac.cam.mef40.fjava.tick2;
 
-import uk.ac.cam.cl.fjava.messages.Message;
-import uk.ac.cam.cl.fjava.messages.RelayMessage;
-import uk.ac.cam.cl.fjava.messages.StatusMessage;
+import uk.ac.cam.cl.fjava.messages.*;
 
 import java.io.*;
 import java.net.Socket;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 public class ChatClient {
@@ -27,6 +26,7 @@ public class ChatClient {
         // Connect
         try {
             final Socket s = new Socket(server, port);
+            final SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm:ss");
 
             Thread output =
                     new Thread() {
@@ -35,7 +35,6 @@ public class ChatClient {
                             try {
                                 InputStream is = s.getInputStream();
                                 ObjectInputStream ois = new ObjectInputStream(is);
-                                SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm:ss");
 
                                 while (true) {
                                     Message msg = (Message)ois.readObject();
@@ -63,9 +62,28 @@ public class ChatClient {
 
             // Handle user input in main thread
             BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
-            OutputStream outputStream = s.getOutputStream();
+            OutputStream os = s.getOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(os);
             while (true) {
+                byte[] input = r.readLine().getBytes();
+                String inputStr = Arrays.toString(input);
+                Message msg;
 
+                // Handle special commands
+                if (inputStr.startsWith("\\nick ")) {
+                    msg = new ChangeNickMessage(inputStr.substring(6));
+                    oos.writeObject(msg);
+                } else if (inputStr.equals("\\quit")) {
+                    System.out.println("quitting");
+                    s.close();
+                    return;
+                } else if (inputStr.startsWith("\\")) {
+                    System.out.format("%s [Server] Unknown command %s", dateFormatter.format(new Date()), inputStr);
+                } else {
+                    // Forward chat message to other clients via server
+                    msg = new ChatMessage(inputStr);
+                    oos.writeObject(msg);
+                }
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());
