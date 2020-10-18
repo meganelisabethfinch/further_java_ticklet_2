@@ -42,12 +42,13 @@ public class ChatClient {
                                     Date date = msg.getCreationTime();
                                     String dateString = dateFormatter.format(date);
 
-                                    System.out.println(dateString);
                                     // Check for either of the server-to-client message types
                                     if (msg instanceof RelayMessage) {
-                                        // var rm = (RelayMessage)msg;
+                                        var rm = (RelayMessage)msg;
+                                        System.out.format("%s [%s] %s\n", dateString, rm.getFrom(), rm.getMessage());
                                     } else if (msg instanceof StatusMessage) {
-
+                                        var sm = (StatusMessage)msg;
+                                        System.out.format("%s [Server] %s\n", dateString, sm.getMessage());
                                     }
                                 }
 
