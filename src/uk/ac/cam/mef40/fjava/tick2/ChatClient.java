@@ -19,7 +19,7 @@ public class ChatClient {
             server = args[0];
             port = Integer.parseInt(args[1]);
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-            System.err.println("This application requires two arguments: <machine> <port");
+            System.err.println("This application requires two arguments: <machine> <port>");
             return;
         }
 
@@ -74,7 +74,7 @@ public class ChatClient {
                     msg = new ChangeNickMessage(inputStr.substring(6));
                     oos.writeObject(msg);
                 } else if (inputStr.equals("\\quit")) {
-                    System.out.format("%s [Client] Connection terminated.\n");
+                    System.out.format("%s [Client] Connection terminated.\n", dateFormatter.format(new Date()));
                     s.close();
                     return;
                 } else if (inputStr.startsWith("\\")) {
@@ -86,7 +86,7 @@ public class ChatClient {
                 }
             }
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            System.err.format("Cannot connect to %s on port %s\n", server, port);
             return;
         }
     }
