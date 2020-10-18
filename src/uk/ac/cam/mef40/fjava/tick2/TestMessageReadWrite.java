@@ -17,13 +17,29 @@
 package uk.ac.cam.mef40.fjava.tick2;
 // TODO: import required classes
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 class TestMessageReadWrite {
 
   static boolean writeMessage(String message, String filename) {
     // TODO: Create an instance of "TestMessage" with "text" set
     //      to "message" and serialise it into a file called "filename".
     //      Return "true" if write was successful; "false" otherwise.
-    return false;
+
+    var testMessage = new TestMessage();
+    testMessage.setMessage(message);
+
+    try {
+      FileOutputStream fos = new FileOutputStream(filename);
+      ObjectOutputStream out = new ObjectOutputStream(fos);
+      out.writeObject(testMessage);
+    } catch (IOException e) {
+      return false;
+    }
+
+    return true;
   }
 
   static String readMessage(String location) {
