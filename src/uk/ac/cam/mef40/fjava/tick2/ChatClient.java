@@ -34,7 +34,7 @@ public class ChatClient {
                         public void run() {
                             try {
                                 InputStream is = s.getInputStream();
-                                ObjectInputStream ois = new ObjectInputStream(is);
+                                DynamicObjectInputStream ois = new DynamicObjectInputStream(is);
 
                                 while (true) {
                                     Message msg = (Message)ois.readObject();
@@ -48,6 +48,12 @@ public class ChatClient {
                                     } else if (msg instanceof StatusMessage) {
                                         var sm = (StatusMessage)msg;
                                         System.out.format("%s [Server] %s\n", dateString, sm.getMessage());
+                                    } else if (msg instanceof NewMessageType) {
+                                        var nm = (NewMessageType)msg;
+                                        ois.addClass(nm.getName(), nm.getClassData());
+                                        System.out.format("%s [Client] New class %s loaded.", dateString, nm.getName());
+                                    } else {
+                                        System.out.format("%s [Client] New message of unknown type received.", dateString);
                                     }
                                 }
 
