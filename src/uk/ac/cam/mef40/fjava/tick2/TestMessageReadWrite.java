@@ -17,14 +17,15 @@
 package uk.ac.cam.mef40.fjava.tick2;
 // TODO: import required classes
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 class TestMessageReadWrite {
 
   static boolean writeMessage(String message, String filename) {
-    // TODO: Create an instance of "TestMessage" with "text" set
+    // Create an instance of "TestMessage" with "text" set
     //      to "message" and serialise it into a file called "filename".
     //      Return "true" if write was successful; "false" otherwise.
 
@@ -35,6 +36,7 @@ class TestMessageReadWrite {
       FileOutputStream fos = new FileOutputStream(filename);
       ObjectOutputStream out = new ObjectOutputStream(fos);
       out.writeObject(testMessage);
+      out.close();
     } catch (IOException e) {
       return false;
     }
@@ -43,7 +45,7 @@ class TestMessageReadWrite {
   }
 
   static String readMessage(String location) {
-    // TODO: If "location" begins with "http://" or "https://" then
+    // If "location" begins with "http://" or "https://" then
     // attempt to download and deserialise an instance of
     // TestMessage; you should use the java.net.URL and
     // java.net.URLConnection classes.  If "location" does not
@@ -54,11 +56,37 @@ class TestMessageReadWrite {
     // If deserialisation is successful, return a reference to the
     // field "text" in the deserialised object. In case of error,
     // return "null".
-    return null;
+
+    ObjectInputStream ois;
+
+    try {
+      if (location.startsWith("http://") || location.startsWith("https://")) {
+        // Download and deserialise a TestMessage
+        URL url = new URL(location);
+        URLConnection connection = url.openConnection();
+        InputStream stream = connection.getInputStream();
+        ois = new ObjectInputStream(stream);
+      } else {
+        // Assume location is name of a file in the filesystem
+        FileInputStream fis = new FileInputStream(location);
+        ois = new ObjectInputStream(fis);
+      }
+
+      TestMessage obj = (TestMessage) ois.readObject();
+      return obj.getMessage();
+    } catch (IOException | ClassNotFoundException e) {
+      System.err.println(e.getMessage());
+      return null;
+    }
   }
 
   public static void main(String args[]) {
-    // TODO: Implement suitable code to help you test your implementation
-    //      of "readMessage" and "writeMessage".
+    try {
+      String location = args[0];
+      String msg = readMessage(location);
+      System.out.println(msg);
+    } catch (ArrayIndexOutOfBoundsException e) {
+      System.err.println("This program takes one argument: <location>");
+    }
   }
 }
