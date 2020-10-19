@@ -35,7 +35,7 @@ public class ChatClient {
         try {
             final Socket s = new Socket(server, port);
             final SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm:ss");
-            System.out.format("%s [Client] Connected to %s on port %s.", dateFormatter.format(new Date()), server, port);
+            System.out.format("%s [Client] Connected to %s on port %s.\n", dateFormatter.format(new Date()), server, port);
 
             Thread output =
                     new Thread() {
