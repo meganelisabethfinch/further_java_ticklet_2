@@ -4,6 +4,8 @@ import uk.ac.cam.cl.fjava.messages.*;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -76,10 +78,16 @@ public class ChatClient {
                                         }
 
                                         System.out.format("%s [Client] %s:%s\n", dateString, msg.getClass().getName(), data);
+
+                                        for (Method method : msg.getClass().getMethods()) {
+                                            if (method.isAnnotationPresent(Execute.class) && method.getParameterCount() == 0) {
+                                                method.invoke(msg);
+                                            }
+                                        }
                                     }
                                 }
 
-                            } catch (IOException | ClassNotFoundException | IllegalArgumentException | IllegalAccessException e) {
+                            } catch (IOException | ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
                                 System.err.println(e.getMessage());
                                 return;
                             }
