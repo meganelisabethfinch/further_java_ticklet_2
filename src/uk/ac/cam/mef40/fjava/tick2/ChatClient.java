@@ -8,6 +8,13 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@FurtherJavaPreamble(
+        author = "Megan Elisabeth Finch",
+        date = "19th October 2020",
+        crsid = "mef40",
+        summary = "A chat client that uses objects and serialisation",
+        ticker = FurtherJavaPreamble.Ticker.C
+)
 public class ChatClient {
     public static void main(String[] args) {
         String server = null;
