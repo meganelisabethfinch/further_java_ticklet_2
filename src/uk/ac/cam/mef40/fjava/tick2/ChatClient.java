@@ -3,10 +3,9 @@ package uk.ac.cam.mef40.fjava.tick2;
 import uk.ac.cam.cl.fjava.messages.*;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.Socket;
-import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 
 public class ChatClient {
@@ -51,13 +50,29 @@ public class ChatClient {
                                     } else if (msg instanceof NewMessageType) {
                                         var nm = (NewMessageType)msg;
                                         ois.addClass(nm.getName(), nm.getClassData());
-                                        System.out.format("%s [Client] New class %s loaded.", dateString, nm.getName());
+                                        System.out.format("%s [Client] New class %s loaded.\n", dateString, nm.getName());
+
+
                                     } else {
-                                        System.out.format("%s [Client] New message of unknown type received.", dateString);
+                                        // System.out.format("%s [Client] New message of unknown type received.\n", dateString);
+                                        String data = "";
+                                        for (Field field : msg.getClass().getDeclaredFields()) {
+                                            field.setAccessible(true);
+                                            String fieldName = field.getName();
+                                            Object fieldValue = field.get(msg);
+                                            data += " " + fieldName + "(" + fieldValue.toString() + "),";
+                                        }
+
+                                        // Trim string
+                                        if (data.endsWith(",")) {
+                                            data = data.substring(0, data.length() - 1);
+                                        }
+
+                                        System.out.format("%s [Client] %s:%s\n", dateString, msg.getClass().getName(), data);
                                     }
                                 }
 
-                            } catch (IOException | ClassNotFoundException e) {
+                            } catch (IOException | ClassNotFoundException | IllegalArgumentException | IllegalAccessException e) {
                                 System.err.println(e.getMessage());
                                 return;
                             }
