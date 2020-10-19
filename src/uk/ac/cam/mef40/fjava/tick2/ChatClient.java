@@ -78,7 +78,7 @@ public class ChatClient {
                                             data = data.substring(0, data.length() - 1);
                                         }
 
-                                        System.out.format("%s [Client] %s:%s\n", dateString, msg.getClass().getName(), data);
+                                        System.out.format("%s [Client] %s:%s\n", dateString, msg.getClass().getSimpleName(), data);
 
                                         for (Method method : msg.getClass().getMethods()) {
                                             if (method.isAnnotationPresent(Execute.class) && method.getParameterCount() == 0) {
